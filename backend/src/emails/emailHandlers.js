@@ -7,7 +7,11 @@ if (!ENV.NODEMAILER_EMAIL || !ENV.NODEMAILER_PASSWORD) {
 }
 
 export const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
   auth: {
     user: ENV.NODEMAILER_EMAIL,
     pass: ENV.NODEMAILER_PASSWORD,
