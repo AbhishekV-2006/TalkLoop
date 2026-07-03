@@ -2,6 +2,10 @@ import { createWelcomeEmailTemplate } from "../emails/emailTemplates.js";
 import nodemailer from "nodemailer";
 import { ENV } from "../lib/env.js";
 
+if (!ENV.NODEMAILER_EMAIL || !ENV.NODEMAILER_PASSWORD) {
+  throw new Error("Nodemailer environment variables are missing");
+}
+
 export const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -11,6 +15,10 @@ export const transporter = nodemailer.createTransport({
 });
 
 const sender = ENV.NODEMAILER_EMAIL;
+
+export const verifyMailer = async () => {
+  await transporter.verify();
+};
 
 
 export const sendWelcomeEmail = async (email, name, clientURL) => {
@@ -23,5 +31,12 @@ export const sendWelcomeEmail = async (email, name, clientURL) => {
     html: createWelcomeEmailTemplate(name, clientURL),
   };
 
-  await transporter.sendMail(mailOptions)
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Welcome email sent", info.messageId);
+    return info;
+  } catch (error) {
+    console.error("Welcome email failed", error);
+    throw error;
+  }
 };

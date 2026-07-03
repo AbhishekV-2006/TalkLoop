@@ -9,6 +9,7 @@ import {connectDB} from "./lib/db.js"
 import cors from "cors";
 import cookieParser from "cookie-parser"
 import { ENV } from "./lib/env.js"
+import { verifyMailer } from "./emails/emailHandlers.js"
 dotenv.config();
 
 import {app ,server } from "./lib/socket.js"
@@ -36,5 +37,10 @@ if(ENV.NODE_ENV ==="production"){
 server.listen(PORT,()=>{
     console.log("Server started at "+ PORT)
     connectDB();
+    verifyMailer().then(() => {
+        console.log("Nodemailer transporter verified")
+    }).catch((error) => {
+        console.error("Nodemailer transporter verification failed", error)
+    })
 })
  
